@@ -1,6 +1,9 @@
 const TAB = '  ';
 
-const numTabs = (line) => line.split(TAB).length - 1;
+// The initial split ensures that we only check the leading whitespace
+const numTabs = (line) => line.split(/\w+/)
+	.shift()
+	.split(TAB).length - 1;
 
 const makeNode = (title, isRoot = false) => ({
 	title,
@@ -31,7 +34,7 @@ const transform = ([{ title, depth }, ...rest], tree) => {
 const parse = function(src) {
 	const feed = src.split(/\n/)
 		.map(line => ({
-			title: line.trim(),
+			title: line.replace(/^\s+/, ''),
 			depth: numTabs(line)
 		}));
 
