@@ -1,37 +1,31 @@
-var getPrefix = (val) => {
+const getPrefix = (val) => {
 	let match = val.match(/^\s+/);
 	let prefix = match ? match[0] : '';
 	return prefix;
 };
 
-var structTransform = (obj, title = null, isRoot = true) => ({
-	title,
-	isRoot,
-	children: Object.keys(obj).map(x => structTransform(obj[x], x, false))
-});
+const makeNodeString = (title, isRoot = false) =>
+	`{ title: ${title}, isRoot: ${isRoot}, children: [`;
 
 var parse = function(src) {
-	const arr = src.split(/\n/);
+	const lines = src.split(/\n/);
 	const res = [];
-	arr.forEach((s, i) => {
-		const prefix = getPrefix(s);
+	lines.forEach((line, i) => {
+		const prefix = getPrefix(line);
 
-		res.push(`'${s.trim()}'`);
+		res.push(makeNodeString(`'${line.trim()}'`));
 
-		let nextLen = i < arr.length - 1 ?
-			getPrefix(arr[i + 1]).length : 0;
-
-		res.push(':{');
+		let nextLen = i < lines.length - 1 ?
+			getPrefix(lines[i + 1]).length : 0;
 
 		if (prefix.length === nextLen) {
-			res.push('},');
+			res.push(']},');
 		} else if (prefix.length > nextLen) {
-			res.push('},' + Array((prefix.length - nextLen) / 2 + 1).join('},'));
+			res.push(Array((prefix.length - nextLen) / 2 + 2).join(']},'));
 		}
 	});
 
-	const struct = eval(`e = {${res.join('')}}`);
-	return structTransform(struct);
+	return eval(`e = ${makeNodeString(null, true)}${res.join('')}]}`);
 };
 
 exports.parse = parse;
