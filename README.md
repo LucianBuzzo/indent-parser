@@ -1,28 +1,106 @@
-Curly braces
+Indent parser
 ---
 
-[![Build Status](https://travis-ci.org/LucianBuzzo/curly-braces.svg?branch=master)](https://travis-ci.org/LucianBuzzo/curly-braces)
+[![Build Status](https://travis-ci.org/LucianBuzzo/indent-parser.svg?branch=master)](https://travis-ci.org/LucianBuzzo/indent-parser)
 
-Exports a function called `validBraces` that takes a string of braces, and 
-determines if the order of the braces is valid. `validBraces` will return true 
-if the string is valid, and false if it's invalid.
+An excercise in building parsers that can parse yaml-esque documents into objects.
 
-All input strings should be nonempty, and should only consist of open 
-parentheses '(' , closed parentheses ')', open brackets '[', closed brackets ']'
-, open curly braces '{' and closed curly braces '}'.
+Given a string like: 
 
-What is considered Valid?
----
----
-
-A string of braces is considered valid if all braces are matched with the correct brace. For example:
-
-'(){}[]' and '([{}])' would be considered valid, while '(}', '[(])', and '[({})](]' would be considered invalid.
-
-Usage
----
-
-```js
-const isValid = validBraces('()[]{()}');
+```
+page 1
+  page 1.1
+  page 1.2
+    page 1.2.1
+page 2
+page 3
+  page 3.1
+  page 3.2
+page 4
+  page 4.1
+    page 4.1.1
+      page 4.1.1.1
+page 5
 ```
 
+The following structure should be generated:
+
+```
+{
+	"title": null,
+	"isRoot": true,
+	"children": [
+		{
+			"title": "page 1",
+			"isRoot": false,
+			"children": [
+				{
+				"title": "page 1.1",
+				"isRoot": false,
+				"children": []
+			},
+			{
+				"title": "page 1.2",
+				"isRoot": false,
+				"children": [
+					{
+					"title": "page 1.2.1",
+					"isRoot": false,
+					"children": []
+				}
+				]
+			}
+			]
+		},
+		{
+			"title": "page 2",
+			"isRoot": false,
+			"children": []
+		},
+		{
+			"title": "page 3",
+			"isRoot": false,
+			"children": [
+				{
+				"title": "page 3.1",
+				"isRoot": false,
+				"children": []
+			},
+			{
+				"title": "page 3.2",
+				"isRoot": false,
+				"children": []
+			}
+			]
+		},
+		{
+			"title": "page 4",
+			"isRoot": false,
+			"children": [
+				{
+					"title": "page 4.1",
+					"isRoot": false,
+					"children": [
+						{
+							"title": "page 4.1.1",
+							"isRoot": false,
+							"children": [
+								{
+									"title": "page 4.1.1.1",
+									"isRoot": false,
+									"children": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "page 5",
+			"isRoot": false,
+			"children": []
+		}
+	]
+}
+```
