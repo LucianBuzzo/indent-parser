@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const parsers = {
 	eval: require('../src/eval').parse,
-	recursion: require('../src/recursion').parse
+	recursion: require('../src/recursion').parse,
+	tree: require('../src/tree').parse
 };
 
 const getText = () => "\
