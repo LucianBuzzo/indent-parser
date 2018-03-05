@@ -1,40 +1,30 @@
 const TAB = '  ';
 
-// The initial split ensures that we only check the leading whitespace
-const numTabs = (line) => line.split(/\w+/)
-	.shift()
-	.split(TAB).length - 1;
+const numTabs = (line, n = 0) =>
+	line.startsWith(TAB) ?
+		numTabs(line.replace(TAB, ''), n + 1) :
+		n
 
-const makeNode = (title, isRoot = false) => ({
+const makeNode = (title = null) => ({
 	title,
-	isRoot,
+	isRoot: title === null,
 	children: [],
 });
 
-const addChildAtDepth = (title, depth, tree) => {
-	if (depth === 0) {
-		tree.children.push(makeNode(title));
-	}
-
-	return depth === 0 ?
-		tree :
+const addChildAtDepth = (title, depth, tree) =>
+	depth === 0 ?
+		(tree.children.push(makeNode(title)), tree) :
 		addChildAtDepth(title, depth - 1, tree.children[tree.children.length - 1]);
-};
 
-const transform = ([{ title, depth }, ...rest], tree) => {
-	if (!tree) {
-		tree = makeNode(null, true);
-	}
-
-	addChildAtDepth(title, depth, tree);
-
-	return rest.length ? transform(rest, tree) : tree;
-};
+const transform = ([{ title, depth }, ...rest], tree = makeNode()) =>
+	(addChildAtDepth(title, depth, tree), rest.length) ?
+		transform(rest, tree) :
+		tree;
 
 const parse = function(src) {
 	const feed = src.split(/\n/)
 		.map(line => ({
-			title: line.replace(/^\s+/, ''),
+			title: line.trimLeft(),
 			depth: numTabs(line)
 		}));
 
